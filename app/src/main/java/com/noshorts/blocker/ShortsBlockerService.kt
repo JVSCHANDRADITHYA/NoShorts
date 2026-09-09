@@ -20,9 +20,7 @@ import android.view.accessibility.AccessibilityNodeInfo
  * Watches the YouTube app view tree and reacts to Shorts.
  *
  * Two independent behaviours:
- *  - the full-screen Shorts player gets escaped (back, then home if back keeps
- *    landing back in Shorts, which is what happens when Shorts was the entry
- *    point of the task);
+ *  - the full-screen Shorts player gets escaped with a single Back press;
  *  - Shorts shelves in the feeds get covered by touch-transparent overlays, so
  *    they are invisible but still scroll normally. If you do manage to tap one,
  *    the player blocker catches it a moment later.
@@ -79,7 +77,7 @@ class ShortsBlockerService : AccessibilityService() {
 
         if (prefs.logViewIds) logViewIds(root)
 
-        if (prefs.blockPlayer && hasAny(root, ShortsSignals.PLAYER_ID_PREFIXES)) {
+        if (prefs.blockPlayer && isShortsPlayerOnScreen(root)) {
             escapeShorts()
             return
         }
@@ -134,6 +132,7 @@ class ShortsBlockerService : AccessibilityService() {
 
         // The overlays belong to the feed; drop them before we leave it.
         clearMasks()
+        Log.i(TAG, "Shorts player detected; pressing Back")
         performGlobalAction(GLOBAL_ACTION_BACK)
         prefs.blockedCount = prefs.blockedCount + 1
 
@@ -146,7 +145,7 @@ class ShortsBlockerService : AccessibilityService() {
             val root = rootInActiveWindow
             val stillInShorts = root != null &&
                 root.packageName == ShortsSignals.YOUTUBE_PACKAGE &&
-                hasAny(root, ShortsSignals.PLAYER_ID_PREFIXES)
+                isShortsPlayerOnScreen(root)
 
             if (!stillInShorts) {
                 escaping = false
@@ -155,6 +154,7 @@ class ShortsBlockerService : AccessibilityService() {
             }
 
             if (backAttempts >= MAX_BACK_ATTEMPTS) {
+                Log.i(TAG, "Back did not clear Shorts")
                 // Back genuinely cannot get out: a deep link opened Shorts as
                 // the only screen in the task.
                 if (prefs.exitAppFallback) {
@@ -264,15 +264,41 @@ class ShortsBlockerService : AccessibilityService() {
         }
     }
 
-    private fun hasAny(root: AccessibilityNodeInfo, prefixes: List<String>): Boolean {
+    /**
+     * True only when the full-screen Shorts player is actually on screen.
+     *
+     * Matching the reel ids alone is not enough. YouTube's bottom-nav tabs are
+     * backed by fragments that stay in the tree after you leave them, so a
+     * cached Shorts fragment keeps matching while you are back on the home
+     * feed -- and acting on that walks the user out of the app one Back press
+     * at a time. Two extra conditions kill the false positive:
+     *
+     *  - the node has to be visible to the user, not just present;
+     *  - it has to be big. The Shorts player fills the display, while leftover
+     *    fragments and feed rows do not.
+     */
+    private fun isShortsPlayerOnScreen(root: AccessibilityNodeInfo): Boolean {
+        val screen = Rect()
+        root.getBoundsInScreen(screen)
+        if (screen.height() <= 0) return false
+        val minHeight = (screen.height() * PLAYER_MIN_HEIGHT_RATIO).toInt()
+
         var found = false
         forEachNode(root) { node ->
-            if (ShortsSignals.matches(node.viewIdResourceName, prefixes)) {
-                found = true
-                false
-            } else {
-                true
+            if (node.isVisibleToUser &&
+                ShortsSignals.matches(node.viewIdResourceName, ShortsSignals.PLAYER_ID_PREFIXES)
+            ) {
+                val bounds = Rect()
+                node.getBoundsInScreen(bounds)
+                if (bounds.height() >= minHeight) {
+                    if (prefs.logViewIds) {
+                        Log.d(TAG, "player match: " + node.viewIdResourceName + " " + bounds)
+                    }
+                    found = true
+                    return@forEachNode false
+                }
             }
+            true
         }
         return found
     }
@@ -313,8 +339,20 @@ class ShortsBlockerService : AccessibilityService() {
          */
         private const val ESCAPE_SETTLE_MS = 900L
 
-        /** Verified failures before we give up on this Short. */
-        private const val MAX_BACK_ATTEMPTS = 3
+        /**
+         * Back presses per Short. Deliberately 1: if the first press did not
+         * clear the player, a second one acts on whatever screen is showing
+         * now, and three in a row is exactly enough to walk out of YouTube.
+         * A Short that survives one Back is worth far less than the app
+         * closing under the user.
+         */
+        private const val MAX_BACK_ATTEMPTS = 1
+
+        /**
+         * Fraction of screen height a reel view must cover to count as the
+         * full-screen player rather than a cached fragment or a feed row.
+         */
+        private const val PLAYER_MIN_HEIGHT_RATIO = 0.6
 
         /** How long to leave Shorts alone after Back has proved useless. */
         private const val QUIET_PERIOD_MS = 5_000L
