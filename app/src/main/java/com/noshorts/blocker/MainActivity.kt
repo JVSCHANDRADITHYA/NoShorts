@@ -61,6 +61,7 @@ class MainActivity : Activity() {
         }
 
         bindSwitch(R.id.switch_player, prefs.blockPlayer) { prefs.blockPlayer = it }
+        bindSwitch(R.id.switch_exit_fallback, prefs.exitAppFallback) { prefs.exitAppFallback = it }
         bindSwitch(R.id.switch_shelves, prefs.hideShelves) { prefs.hideShelves = it }
         bindSwitch(R.id.switch_log, prefs.logViewIds) { prefs.logViewIds = it }
 

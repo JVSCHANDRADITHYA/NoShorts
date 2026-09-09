@@ -19,7 +19,9 @@
 
     <string name="section_blocking">BLOCKING</string>
     <string name="opt_block_player">Close the Shorts player</string>
-    <string name="opt_block_player_help">Presses Back as soon as a Short starts playing. If Back keeps landing in Shorts, it leaves YouTube instead.</string>
+    <string name="opt_block_player_help">Presses Back once as soon as a Short starts playing, then checks whether it worked before trying again.</string>
+    <string name="opt_exit_fallback">Leave YouTube if Back cannot escape</string>
+    <string name="opt_exit_fallback_help">Only fires when Back has provably failed three times, which normally means a link opened Shorts as the only screen. Leave this off unless Shorts are getting stuck.</string>
     <string name="opt_hide_shelves">Hide Shorts rows in feeds</string>
     <string name="opt_hide_shelves_help">Covers Shorts shelves with a black overlay. The feed still scrolls normally underneath. Needs the draw-over-apps permission.</string>
 

@@ -17,6 +17,15 @@ class Prefs(context: Context) {
         get() = sp.getBoolean(KEY_HIDE_SHELVES, true)
         set(value) = sp.edit().putBoolean(KEY_HIDE_SHELVES, value).apply()
 
+    /**
+     * When Back provably cannot escape Shorts, leave YouTube altogether.
+     * Off by default: minimising the app out from under someone is a nasty
+     * surprise, and with the verify-then-retry escape it is rarely needed.
+     */
+    var exitAppFallback: Boolean
+        get() = sp.getBoolean(KEY_EXIT_APP_FALLBACK, false)
+        set(value) = sp.edit().putBoolean(KEY_EXIT_APP_FALLBACK, value).apply()
+
     var logViewIds: Boolean
         get() = sp.getBoolean(KEY_LOG_VIEW_IDS, false)
         set(value) = sp.edit().putBoolean(KEY_LOG_VIEW_IDS, value).apply()
@@ -37,6 +46,7 @@ class Prefs(context: Context) {
 
         private const val KEY_BLOCK_PLAYER = "block_player"
         private const val KEY_HIDE_SHELVES = "hide_shelves"
+        private const val KEY_EXIT_APP_FALLBACK = "exit_app_fallback"
         private const val KEY_LOG_VIEW_IDS = "log_view_ids"
         private const val KEY_LINK_MODE = "link_mode"
         private const val KEY_BLOCKED_COUNT = "blocked_count"

@@ -8,7 +8,7 @@ Stock Android gives no way to inject code into another app's process, so nothing
 
 | Behaviour | How |
 |---|---|
-| Shorts player closes itself | An `AccessibilityService` sees the reel view ids appear and presses Back. If Back keeps landing back in Shorts (deep links, Shorts-first tasks), it goes Home after 3 tries. |
+| Shorts player closes itself | An `AccessibilityService` sees the reel view ids appear and presses Back **once**, then waits ~900ms and re-checks before pressing again. The wait matters: YouTube keeps reel views in the tree for its whole exit animation, so reacting to every matching event fires extra Back presses that pop the screens *behind* Shorts and walk you out of the app. |
 | Shorts shelves vanish from feeds | Black, **touch-transparent** overlays drawn over the shelf bounds. The feed still scrolls normally under them. |
 | `youtube.com/shorts/…` links | Intercepted and rewritten to `youtube.com/watch?v=…`, so a shared Short opens in the regular player. Or open in the browser, or drop it entirely. |
 
