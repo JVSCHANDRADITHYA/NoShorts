@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  packageNames is deliberately pinned to the YouTube app. The framework will not
+  deliver this service events from any other app, so it is structurally unable to
+  observe anything you do outside YouTube.
+-->
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagReportViewIds|flagIncludeNotImportantViews"
+    android:canRetrieveWindowContent="true"
+    android:description="@string/service_description"
+    android:notificationTimeout="100"
+    android:packageNames="com.google.android.youtube"
+    android:summary="@string/service_summary" />
