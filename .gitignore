@@ -8,3 +8,6 @@ captures/
 .cxx/
 *.apk
 *.keystore
+
+# Local docs, not tracked
+docs/
