@@ -1,0 +1,798 @@
+<meta charset="utf-8">
+<title>Talking to the Phone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap">
+
+<style>
+  :root {
+    --ground:     #ffffff;
+    --surface:    #f4f1ef;
+    --surface-2:  #eae4e1;
+    --ink:        #17161a;
+    --ink-soft:   #433e42;
+    --muted:      #7c7478;
+    --rule:       #ddd6d3;
+    --accent:     #c8322a;
+    --accent-bg:  #fbefed;
+    --concept:    #1f5c6b;
+    --concept-bg: #ecf3f5;
+
+    --kw:   #9a2f6b;
+    --typ:  #1f5f8b;
+    --str:  #2b6a3c;
+    --num:  #8a5a00;
+    --com:  #8b8386;
+    --fn:   #59409f;
+  }
+
+  @page { size: A4; margin: 17mm 15mm 15mm 15mm; }
+
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: 'Source Sans 3', Georgia, serif;
+    font-size: 10.4pt;
+    line-height: 1.62;
+    max-width: 175mm;
+  }
+
+  .cover { border-bottom: 2.5pt solid var(--ink); padding-bottom: 9mm; margin-bottom: 8mm; }
+  .cover .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 5mm;
+  }
+  .cover h1 {
+    font-family: 'Bricolage Grotesque', 'Helvetica Neue', sans-serif;
+    font-weight: 700; font-size: 33pt; line-height: 1.02;
+    letter-spacing: -0.022em; margin: 0 0 4mm; text-wrap: balance;
+  }
+  .cover .standfirst {
+    font-size: 12pt; line-height: 1.5; color: var(--ink-soft);
+    max-width: 125mm; margin: 0 0 6mm;
+  }
+  .cover dl {
+    display: grid; grid-template-columns: max-content 1fr; gap: 1.5mm 6mm; margin: 0;
+    font-family: 'JetBrains Mono', monospace; font-size: 8pt; color: var(--muted);
+  }
+  .cover dt { color: var(--ink); font-weight: 500; }
+  .cover dd { margin: 0; }
+
+  .toc {
+    background: var(--surface); border-left: 2.5pt solid var(--accent);
+    padding: 6mm 7mm; margin-bottom: 9mm;
+  }
+  .toc h2 {
+    font-family: 'JetBrains Mono', monospace; font-size: 8pt;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted);
+    margin: 0 0 4mm; font-weight: 500;
+  }
+  .toc ol { margin: 0; padding: 0; list-style: none; columns: 2; column-gap: 9mm; font-size: 9.6pt; }
+  .toc li { margin-bottom: 1.6mm; break-inside: avoid; display: flex; gap: 3mm; }
+  .toc .n {
+    font-family: 'JetBrains Mono', monospace; font-size: 8pt;
+    color: var(--accent); font-weight: 500; min-width: 6mm;
+  }
+
+  section.part { break-before: page; }
+  section.part:first-of-type { break-before: auto; }
+
+  .part-head { border-top: 1.2pt solid var(--ink); padding-top: 3.5mm; margin-bottom: 6mm; }
+  .part-head .n {
+    font-family: 'JetBrains Mono', monospace; font-size: 8pt; letter-spacing: 0.16em;
+    color: var(--accent); font-weight: 500; display: block; margin-bottom: 2mm;
+  }
+  .part-head h2 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700;
+    font-size: 20pt; line-height: 1.12; letter-spacing: -0.018em; margin: 0; text-wrap: balance;
+  }
+
+  h3 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700;
+    font-size: 12.4pt; line-height: 1.25; letter-spacing: -0.01em;
+    margin: 7mm 0 2.5mm; break-after: avoid;
+  }
+  h4 {
+    font-family: 'JetBrains Mono', monospace; font-weight: 500; font-size: 8.4pt;
+    letter-spacing: 0.13em; text-transform: uppercase; color: var(--muted);
+    margin: 6mm 0 2mm; break-after: avoid;
+  }
+
+  p { margin: 0 0 3mm; max-width: 165mm; }
+  ul, ol.body { margin: 0 0 3.5mm; padding-left: 5.5mm; }
+  li { margin-bottom: 1.4mm; }
+  strong { font-weight: 600; }
+
+  code {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.88em;
+    background: var(--surface); padding: 0.5pt 2pt; border-radius: 2pt;
+  }
+
+  figure.code { margin: 0 0 4mm; break-inside: avoid; border: 0.6pt solid var(--rule); }
+  figure.code.long { break-inside: auto; }
+  figure.code figcaption {
+    font-family: 'JetBrains Mono', monospace; font-size: 7.6pt; letter-spacing: 0.06em;
+    color: var(--muted); background: var(--surface-2); padding: 1.4mm 3mm;
+    border-bottom: 0.6pt solid var(--rule);
+  }
+  figure.code figcaption .tag { color: var(--accent); font-weight: 500; }
+
+  pre { margin: 0; padding: 3mm; background: var(--surface); overflow-x: auto; font-size: 8.3pt; line-height: 1.5; }
+  pre code { background: none; padding: 0; font-size: inherit; }
+
+  .hljs-keyword, .hljs-literal, .hljs-built_in { color: var(--kw); font-weight: 500; }
+  .hljs-title, .hljs-title.class_, .hljs-type { color: var(--typ); }
+  .hljs-title.function_ { color: var(--fn); }
+  .hljs-string { color: var(--str); }
+  .hljs-number { color: var(--num); }
+  .hljs-comment { color: var(--com); font-style: italic; }
+  .hljs-attr, .hljs-name { color: var(--typ); }
+  .hljs-meta { color: var(--muted); }
+  .hljs-variable, .hljs-params { color: var(--ink); }
+
+  .note {
+    break-inside: avoid; padding: 3.5mm 4.5mm; margin: 0 0 4mm; font-size: 9.8pt;
+    border-left: 2pt solid var(--concept); background: var(--concept-bg);
+  }
+  .note.gotcha { border-left-color: var(--accent); background: var(--accent-bg); }
+  .note .label {
+    font-family: 'JetBrains Mono', monospace; font-size: 7.4pt; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--concept); font-weight: 500;
+    display: block; margin-bottom: 1.5mm;
+  }
+  .note.gotcha .label { color: var(--accent); }
+  .note p:last-child { margin-bottom: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 9.2pt; margin: 0 0 4mm; break-inside: avoid; }
+  th {
+    text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 7.6pt;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 500;
+    border-bottom: 1pt solid var(--ink); padding: 0 3mm 1.5mm 0; vertical-align: bottom;
+  }
+  td { padding: 1.8mm 3mm 1.8mm 0; border-bottom: 0.5pt solid var(--rule); vertical-align: top; }
+  td code { font-size: 8.4pt; }
+  table.cmd td:first-child, table.cmd th:first-child { width: 44%; }
+
+  dl.lines { margin: 0 0 4mm; font-size: 9.6pt; break-inside: avoid; }
+  dl.lines div {
+    display: grid; grid-template-columns: 34mm 1fr; gap: 4mm;
+    padding: 1.6mm 0; border-bottom: 0.5pt solid var(--rule); break-inside: avoid;
+  }
+  dl.lines dt {
+    font-family: 'JetBrains Mono', monospace; font-size: 8.1pt; color: var(--typ);
+    line-height: 1.5; word-break: break-word;
+  }
+  dl.lines dd { margin: 0; }
+
+  .end {
+    margin-top: 8mm; padding-top: 4mm; border-top: 1.2pt solid var(--ink);
+    font-family: 'JetBrains Mono', monospace; font-size: 8pt; color: var(--muted);
+  }
+</style>
+
+<div class="cover">
+  <p class="eyebrow">NoShorts field manual &middot; Volume II</p>
+  <h1>Talking to the Phone</h1>
+  <p class="standfirst">Everything about <code>adb</code>, from what it actually is to the commands that found the bug in NoShorts. Written against the exact machine and handset this project runs on, so every command here has been executed for real.</p>
+  <dl>
+    <dt>Written for</dt><dd>Chandradithya Janaswami</dd>
+    <dt>Assumes</dt><dd>You can open a terminal. Nothing else.</dd>
+    <dt>Toolchain</dt><dd>platform-tools 37.0.1 at F:\platform-tools</dd>
+    <dt>Handset</dt><dd>OnePlus CPH2717 &middot; Android 16 &middot; ColorOS</dd>
+  </dl>
+</div>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><span class="n">01</span><span>What adb actually is</span></li>
+    <li><span class="n">02</span><span>Installing it, and the PATH</span></li>
+    <li><span class="n">03</span><span>Pairing: USB debugging and the RSA key</span></li>
+    <li><span class="n">04</span><span>Devices, states, and when it lies</span></li>
+    <li><span class="n">05</span><span>Moving apps and files</span></li>
+    <li><span class="n">06</span><span>adb shell — a terminal on the phone</span></li>
+    <li><span class="n">07</span><span>Settings, permissions, appops</span></li>
+    <li><span class="n">08</span><span>logcat, and when it goes silent</span></li>
+    <li><span class="n">09</span><span>Reading the screen: uiautomator</span></li>
+    <li><span class="n">10</span><span>Wireless adb</span></li>
+    <li><span class="n">11</span><span>Every command this project used</span></li>
+    <li><span class="n">12</span><span>Troubleshooting, and staying safe</span></li>
+  </ol>
+</nav>
+
+<!-- ============================================== 01 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 01</span>
+    <h2>What adb actually is</h2>
+  </div>
+
+  <p><strong>adb</strong> is the Android Debug Bridge. Most people treat it as "the command that installs APKs", which undersells it: it is a general-purpose channel into a running Android device, and once you understand its shape the odd failure modes stop being mysterious.</p>
+
+  <h3>Three pieces, not one</h3>
+
+  <p>Typing <code>adb</code> starts a chain of three separate programs.</p>
+
+  <dl class="lines">
+    <div><dt>The client</dt><dd><code>adb.exe</code>, the thing you actually type. It does almost nothing itself: it packages your command and sends it to the server.</dd></div>
+    <div><dt>The server</dt><dd>A background process on your PC, listening on TCP port <strong>5037</strong>. It keeps track of every connected device and routes commands. You never start it by hand; the first <code>adb</code> command starts it for you.</dd></div>
+    <div><dt>The daemon</dt><dd><code>adbd</code>, running on the phone. It receives commands and executes them with the privileges of the <code>shell</code> user.</dd></div>
+  </dl>
+
+  <p>That is why the very first command you run prints something like this, and later ones do not:</p>
+
+  <figure class="code">
+    <figcaption>The server starting itself</figcaption>
+<pre><code class="language-bash">$ adb devices
+* daemon not running; starting now at tcp:5037
+* daemon started successfully
+List of devices attached</code></pre>
+  </figure>
+
+  <div class="note">
+    <span class="label">Concept</span>
+    <p>Because the server is a separate long-lived process, it can get into a bad state that restarting your terminal will not fix. <code>adb kill-server</code> followed by <code>adb start-server</code> is the correct "turn it off and on again", and it resolves a surprising share of problems.</p>
+  </div>
+
+  <h3>What it can and cannot do</h3>
+
+  <p><code>adbd</code> runs as the <code>shell</code> user (uid 2000) on a retail phone. That account is far more powerful than an app but well short of root.</p>
+
+  <table>
+    <tr><th>Can</th><th>Cannot</th></tr>
+    <tr>
+      <td>Install and remove apps</td>
+      <td>Read another app's private data</td>
+    </tr>
+    <tr>
+      <td>Change secure system settings</td>
+      <td>Modify system partitions</td>
+    </tr>
+    <tr>
+      <td>Grant runtime permissions</td>
+      <td>Become root on a retail build</td>
+    </tr>
+    <tr>
+      <td>Read logs, dump system state</td>
+      <td>Bypass the lock screen</td>
+    </tr>
+    <tr>
+      <td>Inject taps and keystrokes</td>
+      <td>Do anything while the phone is off</td>
+    </tr>
+  </table>
+
+  <p><code>adb root</code> exists but only works on <code>userdebug</code> or <code>eng</code> builds. On your CPH2717, a retail <code>user</code> build, it will refuse. That is normal and not something to fight.</p>
+</section>
+
+<!-- ============================================== 02 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 02</span>
+    <h2>Installing it, and the PATH</h2>
+  </div>
+
+  <p>adb ships in a bundle called <strong>platform-tools</strong>. You do not need Android Studio, the SDK manager, or a Google account. It is a 7 MB zip with no installer.</p>
+
+  <figure class="code">
+    <figcaption>Windows, PowerShell — what we actually ran</figcaption>
+<pre><code class="language-bash">Invoke-WebRequest `
+  -Uri 'https://dl.google.com/android/repository/platform-tools-latest-windows.zip' `
+  -OutFile "$env:TEMP\platform-tools.zip"
+
+Expand-Archive -Path "$env:TEMP\platform-tools.zip" -DestinationPath 'F:\' -Force
+
+F:\platform-tools\adb.exe version</code></pre>
+  </figure>
+
+  <p>Google publishes the same bundle for every platform, always at a "latest" URL, so there is no version to pick:</p>
+
+  <table>
+    <tr><th>OS</th><th>URL suffix</th></tr>
+    <tr><td>Windows</td><td><code>platform-tools-latest-windows.zip</code></td></tr>
+    <tr><td>macOS</td><td><code>platform-tools-latest-darwin.zip</code></td></tr>
+    <tr><td>Linux</td><td><code>platform-tools-latest-linux.zip</code></td></tr>
+  </table>
+
+  <h3>Putting adb on the PATH</h3>
+
+  <p>Right now you must type the full path every time. <strong>PATH</strong> is a list of folders your shell searches when you type a bare command; adding the folder makes <code>adb</code> work from anywhere.</p>
+
+  <figure class="code">
+    <figcaption>Permanent, for your user only — no admin needed</figcaption>
+<pre><code class="language-bash">$old = [Environment]::GetEnvironmentVariable('Path', 'User')
+[Environment]::SetEnvironmentVariable('Path', "$old;F:\platform-tools", 'User')</code></pre>
+  </figure>
+
+  <p>Open a <em>new</em> terminal afterwards. A running shell reads PATH once at startup and will not see the change.</p>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — mixing shells on Windows</span>
+    <p>You have both PowerShell and Git Bash here, and they disagree about paths. Git Bash rewrites anything that looks like a Unix path before handing it to a Windows program, so <code>adb shell uiautomator dump /sdcard/ui.xml</code> becomes <code>C:/Program Files/Git/sdcard/ui.xml</code> and fails. This bit us during the NoShorts debugging. Two fixes: prefix the command with <code>MSYS_NO_PATHCONV=1</code>, or double the leading slash as <code>//sdcard/ui.xml</code>. In PowerShell the problem does not exist.</p>
+  </div>
+</section>
+
+<!-- ============================================== 03 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 03</span>
+    <h2>Pairing: USB debugging and the RSA key</h2>
+  </div>
+
+  <p>A phone will not talk to adb until you explicitly allow it. Three steps, once per device.</p>
+
+  <h3>1. Unlock Developer options</h3>
+
+  <p>Settings, About phone, then tap <strong>Build number</strong> seven times. A counter appears and then confirms you are a developer. This has been the ritual since 2012 and every manufacturer keeps it, though they move the screen around. On ColorOS it is under Settings, About device, Version.</p>
+
+  <h3>2. Turn on USB debugging</h3>
+
+  <p>Settings, System, Developer options, <strong>USB debugging</strong>.</p>
+
+  <p>OPPO, OnePlus, Realme and Xiaomi devices also have a separate <strong>Install via USB</strong> toggle. Without it, <code>adb install</code> fails while everything else works, which is a genuinely confusing failure. Some Xiaomi builds require a signed-in account before they let you flip it.</p>
+
+  <h3>3. Accept the RSA fingerprint</h3>
+
+  <p>Plug in the phone. A dialog shows a fingerprint and asks whether to allow debugging. Tick <strong>Always allow from this computer</strong> and accept.</p>
+
+  <p>Under the hood: adb generated a keypair the first time it ran, at <code>~/.android/adbkey</code> and <code>adbkey.pub</code>. Accepting stores your public key on the phone in <code>/data/misc/adb/adb_keys</code>. From then on, authentication is automatic.</p>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — the dialog never appears</span>
+    <p>Almost always a cable problem. Many USB cables are charge-only: four wires for power, no data pair. The phone charges, the PC sees nothing, and there is no error to read. Try a different cable before anything else. If the cable is good, pull down the USB notification and switch the mode from "Charging" to <strong>File transfer</strong>. If the dialog was dismissed once, revoke and replug: Developer options, <strong>Revoke USB debugging authorisations</strong>.</p>
+  </div>
+</section>
+
+<!-- ============================================== 04 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 04</span>
+    <h2>Devices, states, and when it lies</h2>
+  </div>
+
+  <figure class="code">
+    <figcaption>The command you run before every other command</figcaption>
+<pre><code class="language-bash">$ adb devices -l
+List of devices attached
+ZDEE4LHQ5LMJ8DEI  device product:CPH2717IN model:CPH2717 device:OP613BL1 transport_id:1</code></pre>
+  </figure>
+
+  <p>The first column is the device serial. The second is the <strong>state</strong>, and it is the single most useful diagnostic adb gives you.</p>
+
+  <table>
+    <tr><th>State</th><th>Meaning</th><th>Fix</th></tr>
+    <tr><td><code>device</code></td><td>Ready.</td><td>Nothing.</td></tr>
+    <tr><td><code>unauthorized</code></td><td>Connected, but you never accepted the RSA prompt.</td><td>Look at the phone screen and accept.</td></tr>
+    <tr><td><code>offline</code></td><td>Seen but not responding. Often a half-woken device or a stale server.</td><td><code>adb kill-server</code>, replug.</td></tr>
+    <tr><td><code>no permissions</code></td><td>Linux only: your user cannot open the USB device.</td><td>Add a udev rule.</td></tr>
+    <tr><td>(nothing listed)</td><td>Cable, USB mode, or debugging is off.</td><td>Part 03.</td></tr>
+  </table>
+
+  <h3>More than one device</h3>
+
+  <p>With two devices attached, every command errors until you say which one. Use <code>-s</code> with the serial:</p>
+
+  <figure class="code">
+<pre><code class="language-bash">adb -s ZDEE4LHQ5LMJ8DEI shell wm size
+adb -d shell ...    # the only USB device
+adb -e shell ...    # the only emulator</code></pre>
+  </figure>
+</section>
+
+<!-- ============================================== 05 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 05</span>
+    <h2>Moving apps and files</h2>
+  </div>
+
+  <h3>Installing</h3>
+
+  <figure class="code">
+    <figcaption>install</figcaption>
+<pre><code class="language-bash">adb install app.apk              # fresh install
+adb install -r app.apk           # reinstall, keep the app's data
+adb install -g app.apk           # grant all runtime permissions up front
+adb install -d app.apk           # allow a version downgrade
+adb install -r -d --no-streaming app.apk   # for stubborn OEM builds</code></pre>
+  </figure>
+
+  <p>Installing over adb bypasses the Play Protect consent dialog entirely. Play Protect still scans the app and may complain afterwards, but it cannot block the install. That is why adb was the answer when sideloading NoShorts through the file manager was refused.</p>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — INSTALL_FAILED_UPDATE_INCOMPATIBLE</span>
+    <p>Android refuses to update an app when the new APK is signed with a different key than the installed one. This is a security guarantee, not a bug, and there is no flag to override it. You must uninstall first, which wipes the app's data. We hit this on every NoShorts release because each CI run generates a fresh debug keystore. The real fix is one stable signing key reused across builds.</p>
+  </div>
+
+  <figure class="code">
+    <figcaption>uninstall</figcaption>
+<pre><code class="language-bash">adb uninstall com.noshorts.blocker
+adb uninstall -k com.noshorts.blocker   # remove app, keep data and cache</code></pre>
+  </figure>
+
+  <h3>Files</h3>
+
+  <figure class="code">
+    <figcaption>pull and push — device path first for pull, last for push</figcaption>
+<pre><code class="language-bash">adb pull /sdcard/ui.xml  C:\temp\ui.xml
+adb push C:\temp\config.json /sdcard/Download/
+
+adb shell ls /sdcard/
+adb shell rm /sdcard/ui.xml</code></pre>
+  </figure>
+
+  <p><code>/sdcard</code> is shared storage, readable and writable by the shell user. App-private storage under <code>/data/data/&lt;package&gt;</code> is not, unless the app is debuggable, in which case:</p>
+
+  <figure class="code">
+    <figcaption>Reading a debuggable app's own files</figcaption>
+<pre><code class="language-bash">adb shell run-as com.noshorts.blocker ls /data/data/com.noshorts.blocker/shared_prefs
+adb shell run-as com.noshorts.blocker cat /data/data/com.noshorts.blocker/shared_prefs/noshorts.xml</code></pre>
+  </figure>
+
+  <p>This works with <code>NoShorts-debug.apk</code> and not with the release build, because <code>run-as</code> checks the <code>debuggable</code> flag baked into the manifest at build time.</p>
+</section>
+
+<!-- ============================================== 06 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 06</span>
+    <h2>adb shell — a terminal on the phone</h2>
+  </div>
+
+  <p>Android is Linux. <code>adb shell</code> with no arguments drops you into an interactive prompt on the device; with arguments it runs one command and returns.</p>
+
+  <figure class="code">
+<pre><code class="language-bash">adb shell                    # interactive; type exit to leave
+adb shell ls /sdcard         # one command, then back to your PC</code></pre>
+  </figure>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — quoting is parsed twice</span>
+    <p>Your PC shell parses the line, then the device shell parses what survives. Anything with spaces, quotes, <code>*</code>, <code>&gt;</code> or <code>&amp;</code> needs quoting for both. When in doubt, wrap the whole remote command in single quotes: <code>adb shell 'ls /sdcard/*.xml'</code>. Without them the <code>*</code> expands on your PC, against your PC's files, and the result is nonsense.</p>
+  </div>
+
+  <h3>The five subsystems worth knowing</h3>
+
+  <h4>pm — package manager</h4>
+  <figure class="code">
+<pre><code class="language-bash">adb shell pm list packages                   # every package
+adb shell pm list packages -3                # third-party only
+adb shell pm list packages | grep youtube    # find one
+adb shell pm path com.google.android.youtube # where its APK lives
+adb shell pm clear com.noshorts.blocker      # wipe its data, keep it installed
+adb shell pm disable-user com.example.bloat  # disable without uninstalling</code></pre>
+  </figure>
+
+  <h4>am — activity manager</h4>
+  <figure class="code">
+<pre><code class="language-bash">adb shell am start -n com.noshorts.blocker/.MainActivity
+adb shell am start -a android.intent.action.VIEW -d "https://youtube.com/shorts/abc123"
+adb shell am force-stop com.google.android.youtube</code></pre>
+  </figure>
+
+  <h4>dumpsys — the state of everything</h4>
+  <p>Every system service can dump its internal state. This is how we confirmed the accessibility service was actually bound.</p>
+  <figure class="code">
+<pre><code class="language-bash">adb shell dumpsys accessibility            # our service, bound or not
+adb shell dumpsys package com.noshorts.blocker | grep versionName
+adb shell dumpsys activity activities | grep topResumedActivity   # what is on screen
+adb shell dumpsys battery
+adb shell dumpsys window displays</code></pre>
+  </figure>
+
+  <h4>input — synthetic taps and keys</h4>
+  <figure class="code">
+<pre><code class="language-bash">adb shell input tap 540 1200
+adb shell input swipe 540 1800 540 600 300     # x1 y1 x2 y2 duration_ms
+adb shell input text "hello"                    # no spaces without quoting
+adb shell input keyevent KEYCODE_BACK
+adb shell input keyevent KEYCODE_HOME</code></pre>
+  </figure>
+
+  <h4>wm and screencap</h4>
+  <figure class="code">
+<pre><code class="language-bash">adb shell wm size                 # Physical size: 1080x2392
+adb shell wm density
+adb shell screencap -p /sdcard/shot.png &amp;&amp; adb pull /sdcard/shot.png
+adb shell screenrecord /sdcard/clip.mp4        # Ctrl+C to stop</code></pre>
+  </figure>
+</section>
+
+<!-- ============================================== 07 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 07</span>
+    <h2>Settings, permissions, appops</h2>
+  </div>
+
+  <p>This is where adb stops being convenient and starts being genuinely more capable than the UI.</p>
+
+  <h3>settings</h3>
+
+  <p>Android keeps configuration in three namespaces: <code>system</code> (per-user preferences), <code>secure</code> (per-user, app-protected), and <code>global</code> (device-wide). The shell user holds <code>WRITE_SECURE_SETTINGS</code>, which no ordinary app can obtain.</p>
+
+  <figure class="code">
+<pre><code class="language-bash">adb shell settings get secure enabled_accessibility_services
+adb shell settings put secure accessibility_enabled 1
+adb shell settings list global | grep animator</code></pre>
+  </figure>
+
+  <p>That first namespace is exactly how we enabled NoShorts without fighting Android 16's Restricted Settings screen:</p>
+
+  <figure class="code">
+    <figcaption>Enabling an accessibility service from the command line</figcaption>
+<pre><code class="language-bash">adb shell settings put secure enabled_accessibility_services \
+  com.noshorts.blocker/com.noshorts.blocker.ShortsBlockerService
+adb shell settings put secure accessibility_enabled 1</code></pre>
+  </figure>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — this key is a list, and put replaces it</span>
+    <p><code>enabled_accessibility_services</code> holds colon-separated entries. Writing to it <em>overwrites</em> the lot, silently disabling any other accessibility service the user depends on. Always read it first. We checked and found it empty before writing, which is the only reason a blind <code>put</code> was safe.</p>
+  </div>
+
+  <h3>Permissions and appops</h3>
+
+  <p>Runtime permissions, the ones with a dialog, are managed with <code>pm</code>:</p>
+
+  <figure class="code">
+<pre><code class="language-bash">adb shell pm grant  com.example android.permission.CAMERA
+adb shell pm revoke com.example android.permission.CAMERA
+adb shell dumpsys package com.noshorts.blocker | grep -A20 "requested permissions"</code></pre>
+  </figure>
+
+  <p>Special access rights such as "draw over other apps" are not ordinary permissions. They live in a separate subsystem called <strong>app ops</strong>:</p>
+
+  <figure class="code">
+<pre><code class="language-bash">adb shell appops set com.noshorts.blocker SYSTEM_ALERT_WINDOW allow
+adb shell appops get com.noshorts.blocker SYSTEM_ALERT_WINDOW</code></pre>
+  </figure>
+
+  <h3>Developer speed-ups</h3>
+
+  <figure class="code">
+    <figcaption>Disabling animations makes a phone feel twice as fast</figcaption>
+<pre><code class="language-bash">adb shell settings put global window_animation_scale 0
+adb shell settings put global transition_animation_scale 0
+adb shell settings put global animator_duration_scale 0
+# back to normal: set each to 1</code></pre>
+  </figure>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — changes outlive the cable</span>
+    <p>Everything in this section persists after you unplug and after a reboot. adb is not a remote control that stops when you disconnect; it is making the same edits the Settings app would. Write down what you change, or you will spend an evening wondering why animations are gone.</p>
+  </div>
+</section>
+
+<!-- ============================================== 08 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 08</span>
+    <h2>logcat, and when it goes silent</h2>
+  </div>
+
+  <p>Every app and system service writes to a shared ring buffer. <code>adb logcat</code> reads it. Unfiltered it is a firehose, so the flags matter more than the command.</p>
+
+  <figure class="code">
+    <figcaption>The flags you will actually use</figcaption>
+<pre><code class="language-bash">adb logcat                       # live tail, Ctrl+C to stop
+adb logcat -d                    # dump what is buffered, then exit
+adb logcat -t 50                 # last 50 lines only
+adb logcat -c                    # clear the buffer
+adb logcat -s NoShorts           # only the tag NoShorts
+adb logcat -d -s NoShorts -t 40  # the combination worth memorising</code></pre>
+  </figure>
+
+  <p>A filter is <code>TAG:PRIORITY</code>, where priority is one of <strong>V</strong>erbose, <strong>D</strong>ebug, <strong>I</strong>nfo, <strong>W</strong>arn, <strong>E</strong>rror, <strong>F</strong>atal, or <strong>S</strong>ilent. <code>-s NoShorts</code> is shorthand for "silence everything, then show that tag".</p>
+
+  <figure class="code">
+<pre><code class="language-bash">adb logcat NoShorts:D *:S              # exactly what -s does
+adb logcat *:E                          # errors from everything
+adb logcat -b crash                     # the crash buffer
+adb logcat --pid=$(adb shell pidof com.noshorts.blocker)</code></pre>
+  </figure>
+
+  <p>In code, the tag is the first argument you pass:</p>
+
+  <figure class="code">
+    <figcaption><span class="tag">ShortsBlockerService.kt</span></figcaption>
+<pre><code class="language-kotlin">Log.i(TAG, "Shorts player detected; pressing Back")   // TAG = "NoShorts"</code></pre>
+  </figure>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — ColorOS silently drops app logs</span>
+    <p>On your CPH2717, <code>adb logcat -s NoShorts</code> returns <strong>nothing at all</strong>, not even the line logged when the service starts. The service is demonstrably running. Several OEM skins, ColorOS and MIUI among them, suppress third-party app logs from the buffer unless logging is enabled in an engineering menu.</p>
+    <p>This cost us real time during debugging: an empty log looks exactly like code that never ran. If logcat is silent on a device where you know your code is executing, do not conclude the code is dead. Get your evidence another way, which is what Part 09 is for.</p>
+  </div>
+</section>
+
+<!-- ============================================== 09 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 09</span>
+    <h2>Reading the screen: uiautomator</h2>
+  </div>
+
+  <p>This is the command that actually solved NoShorts, and almost nobody outside test automation knows it exists.</p>
+
+  <p><code>uiautomator dump</code> serialises the entire accessibility tree of whatever is currently on screen into XML: every view, its resource id, its class, its bounds, and whether it is on screen. It is the same data an accessibility service sees, which makes it the ground truth for anything built on one.</p>
+
+  <figure class="code">
+    <figcaption>Capturing what is on screen right now</figcaption>
+<pre><code class="language-bash">adb shell uiautomator dump /sdcard/ui.xml
+adb pull /sdcard/ui.xml
+</code></pre>
+  </figure>
+
+  <p>With no path it writes to <code>/sdcard/window_dump.xml</code>. A node looks like this:</p>
+
+  <figure class="code">
+    <figcaption>One node from the real Shorts capture</figcaption>
+<pre><code class="language-xml">&lt;node index="0" class="androidx.recyclerview.widget.RecyclerView"
+      package="com.google.android.youtube"
+      resource-id="com.google.android.youtube:id/reel_recycler"
+      bounds="[0,120][1080,2116]"
+      scrollable="true" enabled="true" /&gt;</code></pre>
+  </figure>
+
+  <p><code>bounds</code> reads <code>[left,top][right,bottom]</code> in pixels. Height here is 2116 minus 120, so 1996 px on a 2392 px screen: 83% of the display, which is what a full-screen player looks like.</p>
+
+  <h3>The diff that found the bug</h3>
+
+  <p>Two captures, one with the Shorts player open and one after a single Back press, then compare which <code>reel_*</code> ids survive.</p>
+
+  <table>
+    <tr><th>State</th><th>reel ids present</th></tr>
+    <tr><td>Shorts player open</td><td>14, including <code>reel_recycler</code>, <code>reel_watch_player</code>, <code>reel_player_page_container</code></td></tr>
+    <tr><td>Home feed, one Back later</td><td><strong>1</strong> — <code>reel_time_bar</code>, at bounds <code>[0,0][1080,2392]</code></td></tr>
+  </table>
+
+  <p>That single surviving node was the entire bug. It was in the detection list, it outlives the player, and it reports the full screen, so it passed every "is the player showing" test we threw at it. Detection stayed true on the home feed and Back kept firing until YouTube closed.</p>
+
+  <div class="note">
+    <span class="label">Method</span>
+    <p>Three fixes were attempted from memory of YouTube's internals and all three failed. One capture, taken thirty seconds after finally reaching for this command, gave the answer outright. When you are reasoning about another app's UI, measure it. The tools are free and the guessing is not.</p>
+  </div>
+
+  <figure class="code">
+    <figcaption>Extracting ids and bounds from a dump, PowerShell</figcaption>
+<pre><code class="language-bash">$xml = [xml](Get-Content ui.xml)
+$xml.SelectNodes('//node') |
+  Where-Object { $_.'resource-id' -match 'reel' } |
+  ForEach-Object { "{0}  {1}" -f $_.'resource-id', $_.bounds }</code></pre>
+  </figure>
+</section>
+
+<!-- ============================================== 10 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 10</span>
+    <h2>Wireless adb</h2>
+  </div>
+
+  <p>Android 11 and later can do all of this with no cable. The phone and PC must be on the same network.</p>
+
+  <figure class="code">
+    <figcaption>Android 11+, the modern pairing flow</figcaption>
+<pre><code class="language-bash"># On the phone: Developer options, Wireless debugging, Pair device with pairing code.
+# It shows an IP:PORT and a six-digit code.
+
+adb pair 192.168.1.42:37105        # then type the code when prompted
+adb connect 192.168.1.42:5555      # port from the Wireless debugging main screen
+adb devices                        # should list an ip:port entry
+
+adb disconnect 192.168.1.42:5555</code></pre>
+  </figure>
+
+  <p>Note the two different ports. Pairing uses a temporary one that changes each time; connecting uses the persistent one shown on the Wireless debugging screen.</p>
+
+  <figure class="code">
+    <figcaption>Pre-Android 11, needs one cable to start</figcaption>
+<pre><code class="language-bash">adb tcpip 5555                     # with USB connected
+# unplug now
+adb connect 192.168.1.42:5555
+adb usb                            # back to cable mode</code></pre>
+  </figure>
+
+  <div class="note gotcha">
+    <span class="label">Gotcha — this is a network service</span>
+    <p>Wireless debugging opens a port on the phone. On a home network that is a reasonable risk; on café or campus Wi-Fi, anyone who can reach the port and get you to accept a prompt has shell access to your device. Turn it off when you are done, and never leave <code>adb tcpip</code> mode on a phone you carry around.</p>
+  </div>
+</section>
+
+<!-- ============================================== 11 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 11</span>
+    <h2>Every command this project used</h2>
+  </div>
+
+  <p>The complete working set from building and debugging NoShorts, in the order it came up. On Windows, prefix each with <code>F:\platform-tools\adb.exe</code> until adb is on your PATH.</p>
+
+  <h4>Setup and sanity</h4>
+  <table class="cmd">
+    <tr><th>Command</th><th>Why</th></tr>
+    <tr><td><code>adb devices -l</code></td><td>Confirm the phone is visible and authorised.</td></tr>
+    <tr><td><code>adb kill-server</code></td><td>First move when adb behaves oddly.</td></tr>
+    <tr><td><code>adb shell getprop ro.build.version.release</code></td><td>Android version. Told us this was Android 16.</td></tr>
+    <tr><td><code>adb shell wm size</code></td><td>Screen size. Needed to turn bounds into percentages.</td></tr>
+  </table>
+
+  <h4>Install cycle</h4>
+  <table class="cmd">
+    <tr><th>Command</th><th>Why</th></tr>
+    <tr><td><code>adb install -r NoShorts-release.apk</code></td><td>Sideload, skipping the Play Protect gate.</td></tr>
+    <tr><td><code>adb uninstall com.noshorts.blocker</code></td><td>Required before a differently signed build.</td></tr>
+    <tr><td><code>adb shell dumpsys package com.noshorts.blocker | grep versionName</code></td><td>Prove the new build actually landed.</td></tr>
+  </table>
+
+  <h4>Enabling the service</h4>
+  <table class="cmd">
+    <tr><th>Command</th><th>Why</th></tr>
+    <tr><td><code>adb shell settings get secure enabled_accessibility_services</code></td><td>Read before writing. Never skip this.</td></tr>
+    <tr><td><code>adb shell settings put secure enabled_accessibility_services &lt;pkg&gt;/&lt;class&gt;</code></td><td>Enable, bypassing Restricted Settings.</td></tr>
+    <tr><td><code>adb shell settings put secure accessibility_enabled 1</code></td><td>Master switch.</td></tr>
+    <tr><td><code>adb shell appops set com.noshorts.blocker SYSTEM_ALERT_WINDOW allow</code></td><td>Draw-over-apps, for the shelf overlays.</td></tr>
+    <tr><td><code>adb shell dumpsys accessibility | grep -i noshorts</code></td><td>Confirm the framework actually bound it.</td></tr>
+  </table>
+
+  <h4>Finding the bug</h4>
+  <table class="cmd">
+    <tr><th>Command</th><th>Why</th></tr>
+    <tr><td><code>adb logcat -d -s NoShorts -t 40</code></td><td>Intended diagnostic. Returned nothing on ColorOS.</td></tr>
+    <tr><td><code>adb shell dumpsys activity activities | grep topResumedActivity</code></td><td>What is actually on screen right now.</td></tr>
+    <tr><td><code>adb shell uiautomator dump /sdcard/ui.xml</code></td><td>The command that solved it.</td></tr>
+    <tr><td><code>adb pull /sdcard/ui.xml</code></td><td>Bring the tree over to analyse.</td></tr>
+    <tr><td><code>adb shell input keyevent KEYCODE_BACK</code></td><td>Change state between captures without touching the phone.</td></tr>
+  </table>
+
+  <div class="note">
+    <span class="label">Undo</span>
+    <p>To reverse everything this project changed on the handset: <code>adb shell settings put secure accessibility_enabled 0</code>, then <code>adb uninstall com.noshorts.blocker</code>. To cut the PC off entirely, use Developer options, Revoke USB debugging authorisations.</p>
+  </div>
+</section>
+
+<!-- ============================================== 12 -->
+<section class="part">
+  <div class="part-head">
+    <span class="n">PART 12</span>
+    <h2>Troubleshooting, and staying safe</h2>
+  </div>
+
+  <table>
+    <tr><th>Symptom</th><th>Most likely cause</th></tr>
+    <tr><td>Device not listed at all</td><td>Charge-only cable. Try another before anything else.</td></tr>
+    <tr><td><code>unauthorized</code></td><td>RSA prompt not accepted. Replug and watch the screen.</td></tr>
+    <tr><td><code>offline</code></td><td>Stale server. <code>adb kill-server</code>, then replug.</td></tr>
+    <tr><td><code>INSTALL_FAILED_UPDATE_INCOMPATIBLE</code></td><td>Different signing key. Uninstall first.</td></tr>
+    <tr><td><code>INSTALL_FAILED_USER_RESTRICTED</code></td><td>OEM "Install via USB" toggle is off.</td></tr>
+    <tr><td><code>INSTALL_FAILED_INSUFFICIENT_STORAGE</code></td><td>Exactly what it says.</td></tr>
+    <tr><td><code>more than one device</code></td><td>Emulator running too. Use <code>-s &lt;serial&gt;</code>.</td></tr>
+    <tr><td>Path errors mentioning Program Files</td><td>Git Bash rewriting <code>/sdcard</code>. Use PowerShell or <code>//sdcard</code>.</td></tr>
+    <tr><td>logcat returns nothing</td><td>OEM log suppression. Not proof your code did not run.</td></tr>
+    <tr><td>Accessibility toggle greyed out</td><td>Android 13+ Restricted Settings. Allow it in app info, or use <code>settings put</code>.</td></tr>
+    <tr><td>Service dies after a reboot</td><td>Battery optimisation. Set the app to Unrestricted.</td></tr>
+  </table>
+
+  <h3>Three habits worth keeping</h3>
+
+  <p><strong>Read before you write.</strong> Settings keys are often lists, and <code>put</code> replaces rather than appends. One unchecked write to <code>enabled_accessibility_services</code> can disable the screen reader someone actually depends on.</p>
+
+  <p><strong>Treat USB debugging as a standing key to the device.</strong> An authorised computer can install apps, read logs and change secure settings without any further prompt. If you plug into a machine you do not control, revoke it afterwards.</p>
+
+  <p><strong>When the phone disagrees with your mental model, dump the phone.</strong> <code>dumpsys</code> and <code>uiautomator dump</code> exist so you never have to argue from memory about what is on screen. Three failed fixes in this project were all the same mistake: reasoning about YouTube's internals from recollection instead of measuring them.</p>
+
+  <div class="end">
+    NoShorts field manual &middot; Volume II &middot; Part 12 of 12 &middot; Commands verified on CPH2717, Android 16
+  </div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>
+  if (window.hljs) { hljs.highlightAll(); }
+</script>
