@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/app_name"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/stats_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:alpha="0.7"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/enable_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="24dp"
+            android:alpha="0.2"
+            android:background="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/section_blocking"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <Switch
+            android:id="@+id/switch_player"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/opt_block_player" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:text="@string/opt_block_player_help"
+            android:textSize="13sp" />
+
+        <Switch
+            android:id="@+id/switch_shelves"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/opt_hide_shelves" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:text="@string/opt_hide_shelves_help"
+            android:textSize="13sp" />
+
+        <Button
+            android:id="@+id/overlay_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="24dp"
+            android:alpha="0.2"
+            android:background="?android:attr/textColorPrimary" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/section_links"
+            android:textSize="13sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:alpha="0.7"
+            android:text="@string/section_links_help"
+            android:textSize="13sp" />
+
+        <RadioGroup
+            android:id="@+id/link_mode_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/link_video"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/link_as_video" />
+
+            <RadioButton
+                android:id="@+id/link_browser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/link_in_browser" />
+
+            <RadioButton
+                android:id="@+id/link_discard"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/link_discard" />
+        </RadioGroup>
+
+        <Button
+            android:id="@+id/links_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/action_open_by_default" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="24dp"
+            android:alpha="0.2"
+            android:background="?android:attr/textColorPrimary" />
+
+        <Switch
+            android:id="@+id/switch_log"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/opt_log_ids" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:alpha="0.7"
+            android:text="@string/opt_log_ids_help"
+            android:textSize="13sp" />
+    </LinearLayout>
+</ScrollView>

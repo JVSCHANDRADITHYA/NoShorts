@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">NoShorts</string>
+
+    <string name="service_label">NoShorts blocker</string>
+    <string name="service_summary">Closes YouTube Shorts the moment they open.</string>
+    <string name="service_description">Watches only the YouTube app. When the Shorts player opens it presses Back for you, and it can cover Shorts shelves in the feed. It reads nothing outside YouTube and sends nothing anywhere.</string>
+
+    <string name="status_active">Active — Shorts are being blocked.</string>
+    <string name="status_inactive">Not active. Turn on NoShorts blocker under Installed apps / Downloaded services.</string>
+    <string name="status_settings_failed">Could not open that Settings screen on this device.</string>
+    <string name="stats_blocked">%1$d Shorts blocked so far</string>
+
+    <string name="action_enable_service">Enable in Accessibility settings</string>
+    <string name="action_open_accessibility">Open Accessibility settings</string>
+    <string name="action_grant_overlay">Allow drawing over other apps</string>
+    <string name="action_overlay_granted">Draw-over-apps permission granted</string>
+    <string name="action_open_by_default">Open app settings (Open by default)</string>
+
+    <string name="section_blocking">BLOCKING</string>
+    <string name="opt_block_player">Close the Shorts player</string>
+    <string name="opt_block_player_help">Presses Back as soon as a Short starts playing. If Back keeps landing in Shorts, it leaves YouTube instead.</string>
+    <string name="opt_hide_shelves">Hide Shorts rows in feeds</string>
+    <string name="opt_hide_shelves_help">Covers Shorts shelves with a black overlay. The feed still scrolls normally underneath. Needs the draw-over-apps permission.</string>
+
+    <string name="section_links">SHORTS LINKS</string>
+    <string name="section_links_help">Choose what happens when you open a youtube.com/shorts link. Use the button below to make NoShorts the default handler for those links.</string>
+    <string name="link_as_video">Open as a normal video (recommended)</string>
+    <string name="link_in_browser">Open in the browser</string>
+    <string name="link_discard">Do not open it at all</string>
+
+    <string name="opt_log_ids">Log view ids (troubleshooting)</string>
+    <string name="opt_log_ids_help">If a YouTube update slips past the blocker, turn this on, open Shorts, then run: adb logcat -s NoShorts. Add the new ids to ShortsSignals.kt.</string>
+
+    <string name="toast_link_discarded">Shorts link blocked</string>
+    <string name="toast_no_handler">Nothing on this device could open that link</string>
+</resources>
