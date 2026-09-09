@@ -26,12 +26,31 @@ object ShortsSignals {
         "reel_player",
         "reel_watch",
         "reel_dyn",
+        "reel_video_interactions",
+        "reel_scrim_shorts",
         "reel_progress_bar",
-        "reel_time_bar",
         "reel_multi_video",
         "shorts_player",
         "shorts_video_container"
     )
+
+    /**
+     * Never put "reel_time_bar" back in the list above.
+     *
+     * Measured on YouTube 21.35.442: with the player open the tree carries 14
+     * reel_* ids; one Back press later, on the home feed, exactly one survives
+     * -- reel_time_bar -- and it reports bounds of [0,0][1080,2392], the whole
+     * screen. It therefore passes both a visibility test and any "is this
+     * full-screen" test, and treating it as a player signal makes the blocker
+     * press Back on the home feed until YouTube itself closes.
+     */
+    val KNOWN_FALSE_POSITIVES = listOf("reel_time_bar")
+
+    /**
+     * How many distinct player ids must be on screen at once. The real player
+     * shows a dozen; leftovers come one at a time.
+     */
+    const val MIN_PLAYER_SIGNALS = 2
 
     /**
      * Ids for the horizontal Shorts *shelf* that gets injected into the home,

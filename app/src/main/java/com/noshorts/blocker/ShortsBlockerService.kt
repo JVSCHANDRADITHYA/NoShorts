@@ -283,24 +283,23 @@ class ShortsBlockerService : AccessibilityService() {
         if (screen.height() <= 0) return false
         val minHeight = (screen.height() * PLAYER_MIN_HEIGHT_RATIO).toInt()
 
-        var found = false
+        val signals = HashSet<String>()
         forEachNode(root) { node ->
+            val id = node.viewIdResourceName
             if (node.isVisibleToUser &&
-                ShortsSignals.matches(node.viewIdResourceName, ShortsSignals.PLAYER_ID_PREFIXES)
+                ShortsSignals.matches(id, ShortsSignals.PLAYER_ID_PREFIXES) &&
+                !ShortsSignals.matches(id, ShortsSignals.KNOWN_FALSE_POSITIVES)
             ) {
                 val bounds = Rect()
                 node.getBoundsInScreen(bounds)
                 if (bounds.height() >= minHeight) {
-                    if (prefs.logViewIds) {
-                        Log.d(TAG, "player match: " + node.viewIdResourceName + " " + bounds)
-                    }
-                    found = true
-                    return@forEachNode false
+                    signals.add(id!!.substringAfterLast('/'))
                 }
             }
-            true
+            // Stop as soon as we have seen enough distinct signals.
+            signals.size < ShortsSignals.MIN_PLAYER_SIGNALS
         }
-        return found
+        return signals.size >= ShortsSignals.MIN_PLAYER_SIGNALS
     }
 
     private fun collectRects(
