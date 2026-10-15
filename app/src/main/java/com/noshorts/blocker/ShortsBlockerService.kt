@@ -7,7 +7,6 @@ import android.graphics.Rect
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import android.os.SystemClock
 import android.provider.Settings
 import android.util.Log
 import android.view.Gravity
@@ -37,12 +36,17 @@ class ShortsBlockerService : AccessibilityService() {
     private val masks = mutableListOf<View>()
     private var maskedRects: List<Rect> = emptyList()
 
-    /** True from the first Back press until we have confirmed the result. */
-    private var escaping = false
-    private var backAttempts = 0
-
-    /** Set when Back has repeatedly failed, to stop hammering the device. */
-    private var quietUntil = 0L
+    /**
+     * Whether the Shorts player was on screen the last time we looked.
+     *
+     * This is the entire safety mechanism. Back is pressed only on the
+     * transition from "not in Shorts" to "in Shorts" -- never while the flag
+     * stays true. So each entry into Shorts costs exactly one Back press, and
+     * a detection that is stuck true (a false positive, or a Short that Back
+     * cannot close) can never accumulate presses and walk the user out of the
+     * app. See escapeShorts().
+     */
+    private var wasInShorts = false
 
     /** Clears leftover overlays once YouTube is no longer the foreground app. */
     private val maskWatchdog = object : Runnable {
@@ -69,21 +73,20 @@ class ShortsBlockerService : AccessibilityService() {
         if (event == null) return
         if (event.packageName != ShortsSignals.YOUTUBE_PACKAGE) return
 
-        // An escape is already in flight; let it finish and verify itself
-        // rather than stacking another Back press on top of the animation.
-        if (escaping) return
-
         val root = rootInActiveWindow ?: return
 
         if (prefs.logViewIds) logViewIds(root)
 
-        if (prefs.blockPlayer && isShortsPlayerOnScreen(root)) {
-            escapeShorts()
+        val inShorts = prefs.blockPlayer && isShortsPlayerOnScreen(root)
+
+        if (inShorts) {
+            if (!wasInShorts) escapeShorts()    // rising edge only
+            wasInShorts = true
             return
         }
 
-        // Out of the player, so a previous stand-down no longer applies.
-        quietUntil = 0L
+        // Out of the player. Arm the edge detector for the next entry.
+        wasInShorts = false
 
         if (prefs.hideShelves) {
             updateShelfMasks(root)
@@ -104,76 +107,38 @@ class ShortsBlockerService : AccessibilityService() {
         super.onDestroy()
     }
 
-    /** Drops overlays and cancels any escape still waiting to be verified. */
+    /** Drops overlays and re-arms the edge detector. */
     private fun teardown() {
-        handler.removeCallbacks(escapeCheck)
-        escaping = false
-        backAttempts = 0
+        wasInShorts = false
         clearMasks()
     }
 
     // ---------------------------------------------------------------- escape
 
     /**
-     * Presses Back exactly once, then waits [ESCAPE_SETTLE_MS] and looks again.
+     * Presses Back exactly once, and then does nothing further.
      *
-     * The wait is the important part. YouTube keeps the reel views in the tree
-     * for the whole of its exit animation, so reacting to every event that
-     * still matches means firing Back two or three more times -- and those
-     * extra presses pop the screens *behind* Shorts, which walks the user out
-     * of YouTube entirely. One press, then verify.
+     * There is deliberately no retry, no timer and no fallback. Earlier
+     * versions verified the press and tried again if Shorts was still showing,
+     * which sounds reasonable and is how this walked users out of YouTube: a
+     * detection that stays true -- because a leftover view matched, or because
+     * Back genuinely cannot close that Short -- turned into press after press,
+     * each one popping whatever screen was behind.
+     *
+     * The caller only invokes this on a rising edge, so the ceiling is one
+     * press per entry into Shorts. A Short that survives it simply plays. That
+     * is a far better failure than the app closing under the user, and it is
+     * now a property of the control flow rather than a setting anyone can
+     * switch off.
+     *
+     * GLOBAL_ACTION_HOME appears nowhere in this file, by design.
      */
     private fun escapeShorts() {
-        if (escaping) return
-        if (SystemClock.uptimeMillis() < quietUntil) return
-
-        escaping = true
-        backAttempts = 1
-
         // The overlays belong to the feed; drop them before we leave it.
         clearMasks()
-        Log.i(TAG, "Shorts player detected; pressing Back")
+        Log.i(TAG, "Shorts player detected; pressing Back once")
         performGlobalAction(GLOBAL_ACTION_BACK)
         prefs.blockedCount = prefs.blockedCount + 1
-
-        handler.postDelayed(escapeCheck, ESCAPE_SETTLE_MS)
-    }
-
-    /** Runs after each Back press to see whether it actually worked. */
-    private val escapeCheck = object : Runnable {
-        override fun run() {
-            val root = rootInActiveWindow
-            val stillInShorts = root != null &&
-                root.packageName == ShortsSignals.YOUTUBE_PACKAGE &&
-                isShortsPlayerOnScreen(root)
-
-            if (!stillInShorts) {
-                escaping = false
-                backAttempts = 0
-                return
-            }
-
-            if (backAttempts >= MAX_BACK_ATTEMPTS) {
-                Log.i(TAG, "Back did not clear Shorts")
-                // Back genuinely cannot get out: a deep link opened Shorts as
-                // the only screen in the task.
-                if (prefs.exitAppFallback) {
-                    Log.i(TAG, "Back failed " + backAttempts + " times; leaving YouTube")
-                    performGlobalAction(GLOBAL_ACTION_HOME)
-                } else {
-                    // Back off instead of minimising the app behind the user.
-                    Log.i(TAG, "Back failed " + backAttempts + " times; standing down")
-                    quietUntil = SystemClock.uptimeMillis() + QUIET_PERIOD_MS
-                }
-                escaping = false
-                backAttempts = 0
-                return
-            }
-
-            backAttempts++
-            performGlobalAction(GLOBAL_ACTION_BACK)
-            handler.postDelayed(this, ESCAPE_SETTLE_MS)
-        }
     }
 
     // ----------------------------------------------------------------- masks
@@ -331,30 +296,18 @@ class ShortsBlockerService : AccessibilityService() {
         private const val TAG = "NoShorts"
 
         /**
-         * How long to let a Back press land before checking whether it worked.
-         * Needs to outlast YouTube's exit animation plus the lag before the
-         * accessibility tree catches up, or the check sees stale reel views and
-         * fires a second, harmful Back press.
-         */
-        private const val ESCAPE_SETTLE_MS = 900L
-
-        /**
          * Back presses per Short. Deliberately 1: if the first press did not
          * clear the player, a second one acts on whatever screen is showing
          * now, and three in a row is exactly enough to walk out of YouTube.
          * A Short that survives one Back is worth far less than the app
          * closing under the user.
          */
-        private const val MAX_BACK_ATTEMPTS = 1
 
         /**
          * Fraction of screen height a reel view must cover to count as the
          * full-screen player rather than a cached fragment or a feed row.
          */
         private const val PLAYER_MIN_HEIGHT_RATIO = 0.6
-
-        /** How long to leave Shorts alone after Back has proved useless. */
-        private const val QUIET_PERIOD_MS = 5_000L
 
         private const val WATCHDOG_INTERVAL_MS = 800L
         private const val MAX_NODES = 2_500
